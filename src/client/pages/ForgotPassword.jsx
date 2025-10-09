@@ -229,7 +229,7 @@ export default function ForgotPassword() {
 
               <button
                 type="button"
-                onClick={() => navigate("/client/login")}
+                onClick={() => navigate("/login")}
                 className="w-full flex items-center justify-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium py-2 transition"
               >
                 <ArrowLeft className="w-4 h-4" />

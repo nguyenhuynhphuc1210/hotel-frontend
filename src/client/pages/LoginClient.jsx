@@ -22,7 +22,7 @@ export default function LoginClient() {
       localStorage.setItem("client_token", res.data.token);
       localStorage.setItem("client_user", JSON.stringify(res.data.user));
 
-      navigate("");
+      navigate("/");
     } catch (err) {
       setError(
         err.response?.data?.message || "Sai email hoặc mật khẩu. Vui lòng thử lại."
