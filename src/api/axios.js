@@ -3,7 +3,7 @@ import axios from "axios";
 
 // ---------------- CLIENT API ----------------
 export const apiClient = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: "https://hotel-api-7wfh.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,7 +20,7 @@ apiClient.interceptors.request.use((config) => {
 
 // ---------------- ADMIN API ----------------
 export const apiAdmin = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: "https://hotel-api-7wfh.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
