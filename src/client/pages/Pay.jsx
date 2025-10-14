@@ -28,11 +28,22 @@ export default function Pay() {
 
   if (!form) return <p>Không có dữ liệu thanh toán!</p>;
 
+  const formatCurrency = (amount) => {
+    return (
+      Number(amount || 0).toLocaleString("vi-VN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }) + " đ"
+    );
+  };
+
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Thanh toán phòng {room?.room_number}</h2>
-      <p>Tổng tiền: {total.toLocaleString("vi-VN")} đ</p>
-      <p>Số tiền còn lại cần thanh toán: {deposit.toLocaleString("vi-VN")} đ</p>
+      <h2 className="text-2xl font-bold mb-4">
+        Thanh toán phòng {room?.room_number}
+      </h2>
+      <p>Tổng tiền: {formatCurrency(total)}</p>
+      <p>Số tiền còn lại cần thanh toán: {formatCurrency(deposit)}</p>
       <button
         onClick={handlePay}
         className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"

@@ -37,7 +37,6 @@ export default function MyBookingDetail() {
     ? 0
     : Math.max(Number(booking.total_price || 0) - deposit, 0);
 
-  // 🟢 Hàm hiển thị trạng thái đặt phòng (đã thêm trạng thái "confirmed")
   const renderBookingStatus = (status) => {
     switch (status) {
       case "pending":
@@ -57,6 +56,19 @@ export default function MyBookingDetail() {
     }
   };
 
+  const renderRoomType = (type) => {
+  switch (type) {
+    case "single":
+      return "Phòng đơn";
+    case "double":
+      return "Phòng đôi";
+    case "suite":
+      return "Phòng hạng sang";
+    default:
+      return type || "Không xác định";
+  }
+};
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h2 className="text-3xl font-bold mb-6 text-center">
@@ -71,7 +83,7 @@ export default function MyBookingDetail() {
 
         <div className="flex justify-between">
           <span className="font-semibold">Loại phòng:</span>
-          <span>{booking.room?.type || "Không xác định"}</span>
+          <span>{renderRoomType(booking.room?.type)}</span>
         </div>
 
         <div className="flex justify-between">
