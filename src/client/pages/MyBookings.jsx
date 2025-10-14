@@ -43,7 +43,11 @@ export default function MyBookings() {
       setBookings((prev) =>
         prev.map((b) =>
           b.id === id
-            ? { ...b, status: "cancelled", invoice: { ...b.invoice, status: "cancelled" } }
+            ? {
+                ...b,
+                status: "cancelled",
+                invoice: { ...b.invoice, status: "cancelled" },
+              }
             : b
         )
       );
@@ -66,22 +70,35 @@ export default function MyBookings() {
               <tr>
                 <th className="border px-3 py-2 text-left text-sm">ID</th>
                 <th className="border px-3 py-2 text-left text-sm">Phòng</th>
-                <th className="border px-3 py-2 text-right text-sm">Tổng tiền</th>
+                <th className="border px-3 py-2 text-right text-sm">
+                  Tổng tiền
+                </th>
                 <th className="border px-3 py-2 text-right text-sm">Đã cọc</th>
                 <th className="border px-3 py-2 text-right text-sm">Còn lại</th>
-                <th className="border px-3 py-2 text-center text-sm">Thanh toán</th>
-                <th className="border px-3 py-2 text-center text-sm">Tình trạng</th>
-                <th className="border px-3 py-2 text-center text-sm">Hành động</th>
+                <th className="border px-3 py-2 text-center text-sm">
+                  Thanh toán
+                </th>
+                <th className="border px-3 py-2 text-center text-sm">
+                  Tình trạng
+                </th>
+                <th className="border px-3 py-2 text-center text-sm">
+                  Hành động
+                </th>
               </tr>
             </thead>
             <tbody>
               {bookings.map((b) => {
                 const deposit = Number(b.deposit_amount || 0);
                 const isPaid = b.invoice?.status === "paid";
-                const remain = isPaid ? 0 : Math.max(Number(b.total_price || 0) - deposit, 0);
+                const remain = isPaid
+                  ? 0
+                  : Math.max(Number(b.total_price || 0) - deposit, 0);
 
                 return (
-                  <tr key={b.id} className="hover:bg-gray-50 border-b last:border-b-0">
+                  <tr
+                    key={b.id}
+                    className="hover:bg-gray-50 border-b last:border-b-0"
+                  >
                     <td className="border px-3 py-2 text-sm">{b.id}</td>
                     <td className="border px-3 py-2 text-sm">
                       {b.room?.room_number || "Không xác định"}
@@ -124,6 +141,8 @@ export default function MyBookings() {
                           ? "text-green-600"
                           : b.status === "cancelled"
                           ? "text-gray-500"
+                          : b.status === "confirmed"
+                          ? "text-blue-600"
                           : "text-yellow-600"
                       }`}
                     >
@@ -131,6 +150,8 @@ export default function MyBookings() {
                         ? "Hoàn thành"
                         : b.status === "cancelled"
                         ? "Đã hủy"
+                        : b.status === "confirmed"
+                        ? "Đã xác nhận"
                         : "Đang xử lý"}
                     </td>
 

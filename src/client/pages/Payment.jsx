@@ -18,6 +18,19 @@ export default function Payment() {
     return date.toLocaleDateString("vi-VN");
   };
 
+  // ✅ Hàm dịch loại phòng sang tiếng Việt
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case "single":
+        return "Phòng đơn";
+      case "double":
+        return "Phòng đôi";
+      case "suite":
+        return "Phòng VIP";
+      default:
+        return type;
+    }
+  };
 
   const deposit = Math.round(total * 0.2);
 
@@ -37,7 +50,7 @@ export default function Payment() {
           Thông tin phòng
         </h3>
         <p><strong>Số phòng:</strong> {room.room_number}</p>
-        <p><strong>Loại phòng:</strong> {room.type}</p>
+        <p><strong>Loại phòng:</strong> {getTypeLabel(room.type)}</p>
         <p><strong>Giá / đêm:</strong> {room.price.toLocaleString("vi-VN")} ₫</p>
         <p><strong>Mô tả:</strong> {room.description || "Không có mô tả"}</p>
       </div>
