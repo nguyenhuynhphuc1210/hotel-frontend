@@ -4,7 +4,7 @@ import { apiClient } from "../../api/axios";
 
 export default function Rooms() {
   const [rooms, setRooms] = useState([]);
-  const [allRoomTypes, setAllRoomTypes] = useState([]); // 👈 Lưu toàn bộ loại phòng
+  const [allRoomTypes, setAllRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
   const [sortBy, setSortBy] = useState("price-asc");
@@ -28,7 +28,7 @@ export default function Rooms() {
 
   const fetchAllRoomTypes = async () => {
     try {
-      const res = await apiClient.get("/rooms?all=true"); 
+      const res = await apiClient.get("/rooms?all=true");
       const types = [...new Set(res.data.map((r) => r.type))];
       setAllRoomTypes(types);
     } catch (err) {
@@ -46,12 +46,11 @@ export default function Rooms() {
     setLoading(true);
 
     if (type === "all") {
-
       await fetchRooms(1);
     } else {
       try {
         const res = await apiClient.get(`/rooms?type=${type}`);
-        setRooms(res.data); 
+        setRooms(res.data);
         setLastPage(1);
         setCurrentPage(1);
       } catch (err) {
@@ -71,6 +70,24 @@ export default function Rooms() {
     if (sortBy === "name") return a.room_number.localeCompare(b.room_number);
     return 0;
   });
+
+  // 🟢 Chuyển loại phòng sang tiếng Việt
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case "single":
+        return "Phòng đơn";
+      case "double":
+        return "Phòng đôi";
+      case "suite":
+        return "Phòng hạng sang";
+      case "deluxe":
+        return "Phòng cao cấp";
+      case "family":
+        return "Phòng gia đình";
+      default:
+        return type;
+    }
+  };
 
   if (loading) {
     return (
@@ -112,7 +129,7 @@ export default function Rooms() {
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  {type === "all" ? "Tất cả" : type}
+                  {type === "all" ? "Tất cả" : getTypeLabel(type)}
                 </button>
               ))}
             </div>
@@ -190,7 +207,7 @@ export default function Rooms() {
                       </Link>
                       <div className="mt-1">
                         <span className="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded">
-                          {room.type}
+                          {getTypeLabel(room.type)}
                         </span>
                       </div>
                     </div>
