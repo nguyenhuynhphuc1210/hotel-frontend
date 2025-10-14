@@ -21,27 +21,18 @@ export default function RoomDetail() {
   const [total, setTotal] = useState(0);
   const [nights, setNights] = useState(0);
 
-  // 🔹 Lấy thông tin user nếu đã đăng nhập
   useEffect(() => {
-    const token = localStorage.getItem("client_token");
-    if (!token) return; // chưa đăng nhập thì bỏ qua
-
-    apiClient
-      .get("/client/profile")
-      .then((res) => {
-        const user = res.data;
-        setForm((prev) => ({
-          ...prev,
-          fullname: user.name || "",
-          email: user.email || "",
-        }));
-      })
-      .catch((err) => {
-        console.error("Không thể lấy thông tin user:", err);
-      });
+    const savedUser = JSON.parse(localStorage.getItem("client_user") || "null");
+    if (savedUser) {
+      setForm((prev) => ({
+        ...prev,
+        fullname: savedUser.fullname || "",
+        email: savedUser.email || "",
+      }));
+    }
   }, []);
 
-  // 🔹 Lấy chi tiết phòng
+  // Lấy chi tiết phòng
   useEffect(() => {
     apiClient
       .get(`/rooms/${id}`)
@@ -53,7 +44,7 @@ export default function RoomDetail() {
       });
   }, [id, navigate]);
 
-  // 🔹 Lấy danh sách dịch vụ
+  // Lấy danh sách dịch vụ
   useEffect(() => {
     apiClient
       .get("/services/all")
@@ -61,7 +52,7 @@ export default function RoomDetail() {
       .catch((err) => console.error(err));
   }, []);
 
-  // 🔹 Tính tổng tiền
+  // Tính tổng tiền
   useEffect(() => {
     if (room && form.checkin_date && form.checkout_date) {
       const checkin = new Date(form.checkin_date);
@@ -84,7 +75,7 @@ export default function RoomDetail() {
     }
   }, [form.checkin_date, form.checkout_date, room, selectedServices]);
 
-  // 🔹 Chọn dịch vụ và số lượng
+  // Chọn dịch vụ và số lượng
   const handleServiceChange = (service, quantity) => {
     if (quantity > 0) {
       setSelectedServices((prev) => {
@@ -100,15 +91,20 @@ export default function RoomDetail() {
     }
   };
 
-  // 🔹 Xử lý thanh toán
-  const handleProceedToPayment = () => {
-    const token = localStorage.getItem("client_token");
-    if (!token) {
-      toast.error("Vui lòng đăng nhập để đặt phòng!");
-      navigate("/login");
-      return;
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case "single":
+        return "Phòng đơn";
+      case "double":
+        return "Phòng đôi";
+      case "suite":
+        return "Phòng VIP";
+      default:
+        return type;
     }
-
+  };
+  // Thanh toán
+  const handleProceedToPayment = () => {
     if (
       !form.fullname ||
       !form.phone ||
@@ -120,7 +116,6 @@ export default function RoomDetail() {
       toast.error("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
-
     if (new Date(form.checkout_date) <= new Date(form.checkin_date)) {
       toast.error("Ngày trả phòng phải sau ngày nhận phòng!");
       return;
@@ -210,6 +205,30 @@ export default function RoomDetail() {
                       {currentImageIndex + 1} / {roomImages.length}
                     </div>
                   </div>
+                  {/* Thumbnails */}
+                  {roomImages.length > 1 && (
+                    <div className="p-4 flex gap-2 overflow-x-auto">
+                      {roomImages.map((img, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition ${
+                            currentImageIndex === index
+                              ? "border-blue-600"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          <img
+                            src={`${import.meta.env.VITE_API_URL}/storage/${
+                              img.image_path
+                            }`}
+                            alt={`Thumbnail ${index}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="h-96 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
@@ -230,7 +249,7 @@ export default function RoomDetail() {
                   </h1>
                   <div className="flex items-center gap-3">
                     <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg">
-                      {room.type}
+                      {getTypeLabel(room.type)}
                     </span>
                     <span
                       className={`inline-block px-3 py-1 text-sm font-medium rounded-lg ${

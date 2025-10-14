@@ -79,11 +79,7 @@ export default function Rooms() {
       case "double":
         return "Phòng đôi";
       case "suite":
-        return "Phòng hạng sang";
-      case "deluxe":
-        return "Phòng cao cấp";
-      case "family":
-        return "Phòng gia đình";
+        return "Phòng VIP";
       default:
         return type;
     }
