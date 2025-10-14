@@ -9,7 +9,6 @@ export default function Rooms() {
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
 
-  // 🟢 Lấy danh sách phòng (phân trang)
   const fetchRooms = async (page = 1) => {
     try {
       const res = await apiAdmin.get(`/rooms?page=${page}`);
@@ -27,7 +26,6 @@ export default function Rooms() {
     fetchRooms(currentPage);
   }, [currentPage]);
 
-  // 🟢 Xử lý xóa phòng
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa phòng này?")) return;
     try {
@@ -40,7 +38,6 @@ export default function Rooms() {
     }
   };
 
-  // 🟢 Hiển thị trạng thái phòng
   const getStatusDisplay = (status) => {
     switch (status) {
       case "available":
@@ -70,14 +67,25 @@ export default function Rooms() {
     }
   };
 
-  // 🟢 Chuyển trang
+  const getRoomTypeDisplay = (type) => {
+    switch (type) {
+      case "single":
+        return "Phòng đơn";
+      case "double":
+        return "Phòng đôi";
+      case "suite":
+        return "Phòng VIP";
+      default:
+        return "Không xác định";
+    }
+  };
+
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage && page !== currentPage) {
       setCurrentPage(page);
     }
   };
 
-  // 🟢 Hiển thị nút phân trang (1, 2, 3, ...)
   const renderPagination = () => {
     const pages = [];
     const maxVisible = 5;
@@ -193,7 +201,7 @@ export default function Rooms() {
                   )}
                 </td>
                 <td className="border px-4 py-2">{room.room_number}</td>
-                <td className="border px-4 py-2">{room.type}</td>
+                <td className="border px-4 py-2">{getRoomTypeDisplay(room.type)}</td>
                 <td className="border px-4 py-2">
                   {Number(room.price).toLocaleString("vi-VN")} đ
                 </td>

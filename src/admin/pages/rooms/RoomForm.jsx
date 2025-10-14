@@ -81,9 +81,9 @@ export default function RoomForm({
           required
         >
           <option value="">Chọn loại phòng</option>
-          <option value="Single">Single</option>
-          <option value="Double">Double</option>
-          <option value="Suite">Suite</option>
+          <option value="single">Phòng đơn</option>
+          <option value="double">Phòng đôi</option>
+          <option value="suite">Phòng VIP</option>
         </select>
       </div>
 

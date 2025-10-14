@@ -75,7 +75,7 @@ export default function ClientHeader() {
               className={`flex items-center gap-3 cursor-pointer transition-all duration-300 ${
                 scrolled ? "text-blue-600" : "text-white"
               }`}
-              onClick={() => navigate("/client")}
+              onClick={() => navigate("/")}
             >
               <div className="text-4xl">🏨</div>
               <div>
