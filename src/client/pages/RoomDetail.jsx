@@ -121,6 +121,20 @@ export default function RoomDetail() {
       return;
     }
 
+    const savedUser = JSON.parse(localStorage.getItem("client_user") || "null");
+
+    if (!savedUser) {
+      toast.info(
+        "Bạn chưa đăng nhập. Vui lòng đăng ký tài khoản bằng email này để theo dõi đặt phòng trong 'Đặt phòng của tôi'.",
+        { autoClose: 7000 }
+      );
+    } else if (savedUser.email !== form.email) {
+      toast.warn(
+        "Email đặt phòng khác với email tài khoản hiện tại. Vui lòng đăng nhập bằng đúng email để theo dõi đặt phòng.",
+        { autoClose: 7000 }
+      );
+    }
+
     navigate("/payment", {
       state: { room, form, selectedServices, total },
     });
