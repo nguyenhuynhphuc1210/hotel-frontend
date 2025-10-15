@@ -11,12 +11,13 @@ export default function RoomForm({
   const [price, setPrice] = useState("");
   const [status, setStatus] = useState("available");
   const [newImages, setNewImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
   const [oldImages, setOldImages] = useState([]);
   const [deletedImages, setDeletedImages] = useState([]);
 
   const navigate = useNavigate();
 
-  // ✅ Chỉ chạy khi có dữ liệu edit (có id)
+  // ✅ Khi có dữ liệu edit
   useEffect(() => {
     if (initialData && initialData.id) {
       setRoomNumber(initialData.room_number || "");
@@ -33,6 +34,21 @@ export default function RoomForm({
     setDeletedImages((prev) => [...prev, id]);
   };
 
+  // ✅ Khi chọn ảnh mới
+  const handleNewImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    const previews = files.map((file) => URL.createObjectURL(file));
+
+    setNewImages((prev) => [...prev, ...files]);
+    setPreviewImages((prev) => [...prev, ...previews]);
+  };
+
+  // ✅ Xóa ảnh mới (chưa upload)
+  const handleDeleteNewImage = (index) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   // ✅ Gửi form
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,11 +59,9 @@ export default function RoomForm({
     formData.append("price", price);
     formData.append("status", status);
 
-    // Nếu là thêm mới
     if (!initialData?.id) {
       newImages.forEach((img) => formData.append("images[]", img));
     } else {
-      // Nếu là cập nhật
       newImages.forEach((img) => formData.append("new_images[]", img));
       deletedImages.forEach((id) => formData.append("deleted_images[]", id));
     }
@@ -120,9 +134,7 @@ export default function RoomForm({
             {oldImages.map((img) => (
               <div key={img.id} className="relative group">
                 <img
-                  src={`${import.meta.env.VITE_API_URL}/storage/${
-                    img.image_path
-                  }`}
+                  src={`${import.meta.env.VITE_API_URL}/storage/${img.image_path}`}
                   alt="Room"
                   className="w-24 h-24 object-cover rounded border"
                 />
@@ -147,9 +159,34 @@ export default function RoomForm({
           multiple
           accept="image/*"
           className="w-full border px-3 py-2 rounded"
-          onChange={(e) => setNewImages([...e.target.files])}
+          onChange={handleNewImagesChange}
         />
       </div>
+
+      {/* ✅ Preview ảnh mới */}
+      {previewImages.length > 0 && (
+        <div>
+          <label className="block mb-1 font-medium">Ảnh xem trước</label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {previewImages.map((src, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={src}
+                  alt={`Preview ${index + 1}`}
+                  className="w-24 h-24 object-cover rounded border"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleDeleteNewImage(index)}
+                  className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded opacity-80 group-hover:opacity-100"
+                >
+                  ❌
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Nút hành động */}
       <div className="flex space-x-3">
