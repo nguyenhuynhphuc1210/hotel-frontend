@@ -79,7 +79,7 @@ export default function ClientHeader() {
             >
               <div className="text-4xl">🏨</div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Hotel Booking</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Aurora Hotel</h1>
                 <p className={`text-xs ${scrolled ? "text-gray-600" : "text-blue-100"}`}>
                   Luxury & Comfort
                 </p>

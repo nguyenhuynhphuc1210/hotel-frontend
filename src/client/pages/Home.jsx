@@ -36,12 +36,13 @@ export default function Home() {
               </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Chào mừng đến với<br />
-              <span className="text-yellow-300">Hotel Booking</span>
+              Chào mừng đến với
+              <br />
+              <span className="text-yellow-300">Aurora Hotel</span>
             </h1>
             <p className="text-lg md:text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
-              Trải nghiệm sự sang trọng và thoải mái ngay tại trung tâm thành phố.
-              Đặt phòng ngay hôm nay để tận hưởng kỳ nghỉ tuyệt vời.
+              Trải nghiệm sự sang trọng và thoải mái ngay tại trung tâm thành
+              phố. Đặt phòng ngay hôm nay để tận hưởng kỳ nghỉ tuyệt vời.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -59,11 +60,18 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
+
         {/* Decorative waves */}
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#F9FAFB"/>
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
+              fill="#F9FAFB"
+            />
           </svg>
         </div>
       </section>
@@ -89,7 +97,8 @@ export default function Home() {
                 Phòng hiện đại
               </h3>
               <p className="text-gray-600 text-center leading-relaxed">
-                Phòng rộng rãi, thiết kế sang trọng với đầy đủ tiện nghi cao cấp cho sự thoải mái tối đa.
+                Phòng rộng rãi, thiết kế sang trọng với đầy đủ tiện nghi cao cấp
+                cho sự thoải mái tối đa.
               </p>
             </div>
 
@@ -101,7 +110,8 @@ export default function Home() {
                 Nhà hàng & Bar
               </h3>
               <p className="text-gray-600 text-center leading-relaxed">
-                Thưởng thức các món ăn ngon và cocktail được chế biến bởi đầu bếp hàng đầu.
+                Thưởng thức các món ăn ngon và cocktail được chế biến bởi đầu
+                bếp hàng đầu.
               </p>
             </div>
 
@@ -113,7 +123,8 @@ export default function Home() {
                 Dịch vụ 24/7
               </h3>
               <p className="text-gray-600 text-center leading-relaxed">
-                Đội ngũ nhân viên chuyên nghiệp luôn sẵn sàng hỗ trợ bạn mọi lúc trong suốt kỳ nghỉ.
+                Đội ngũ nhân viên chuyên nghiệp luôn sẵn sàng hỗ trợ bạn mọi lúc
+                trong suốt kỳ nghỉ.
               </p>
             </div>
 
@@ -125,7 +136,8 @@ export default function Home() {
                 Hồ bơi & Spa
               </h3>
               <p className="text-gray-600 text-center leading-relaxed">
-                Thư giãn tại hồ bơi ngoài trời và spa với các liệu pháp chăm sóc đẳng cấp.
+                Thư giãn tại hồ bơi ngoài trời và spa với các liệu pháp chăm sóc
+                đẳng cấp.
               </p>
             </div>
 
@@ -137,7 +149,8 @@ export default function Home() {
                 Phòng họp
               </h3>
               <p className="text-gray-600 text-center leading-relaxed">
-                Không gian hội nghị chuyên nghiệp với trang thiết bị hiện đại cho doanh nghiệp.
+                Không gian hội nghị chuyên nghiệp với trang thiết bị hiện đại
+                cho doanh nghiệp.
               </p>
             </div>
 
@@ -149,32 +162,9 @@ export default function Home() {
                 Vị trí thuận lợi
               </h3>
               <p className="text-gray-600 text-center leading-relaxed">
-                Tọa lạc tại trung tâm thành phố, dễ dàng di chuyển đến mọi địa điểm quan trọng.
+                Tọa lạc tại trung tâm thành phố, dễ dàng di chuyển đến mọi địa
+                điểm quan trọng.
               </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="mb-20">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-2xl p-12 text-white">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-5xl font-bold mb-2">200+</div>
-                <p className="text-blue-100">Phòng nghỉ</p>
-              </div>
-              <div>
-                <div className="text-5xl font-bold mb-2">50K+</div>
-                <p className="text-blue-100">Khách hàng hài lòng</p>
-              </div>
-              <div>
-                <div className="text-5xl font-bold mb-2">10+</div>
-                <p className="text-blue-100">Năm kinh nghiệm</p>
-              </div>
-              <div>
-                <div className="text-5xl font-bold mb-2">4.8⭐</div>
-                <p className="text-blue-100">Đánh giá</p>
-              </div>
             </div>
           </div>
         </section>
@@ -185,7 +175,9 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Khách hàng nói gì về chúng tôi
             </h2>
-            <p className="text-gray-600">Những đánh giá chân thực từ khách hàng</p>
+            <p className="text-gray-600">
+              Những đánh giá chân thực từ khách hàng
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -200,7 +192,8 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-600 italic">
-                "Phòng rất sạch sẽ và thoải mái. Nhân viên thân thiện và chuyên nghiệp. Tôi sẽ quay lại!"
+                "Phòng rất sạch sẽ và thoải mái. Nhân viên thân thiện và chuyên
+                nghiệp. Tôi sẽ quay lại!"
               </p>
             </div>
 
@@ -215,7 +208,8 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-600 italic">
-                "Vị trí tuyệt vời, gần trung tâm. Ăn sáng buffet rất ngon. Đáng tiền!"
+                "Vị trí tuyệt vời, gần trung tâm. Ăn sáng buffet rất ngon. Đáng
+                tiền!"
               </p>
             </div>
 
@@ -230,7 +224,8 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-600 italic">
-                "Trải nghiệm tuyệt vời! Hồ bơi và spa rất đẳng cấp. Highly recommended!"
+                "Trải nghiệm tuyệt vời! Hồ bơi và spa rất đẳng cấp. Highly
+                recommended!"
               </p>
             </div>
           </div>
@@ -243,7 +238,8 @@ export default function Home() {
               Sẵn sàng lên kế hoạch cho kỳ nghỉ của bạn?
             </h2>
             <p className="text-lg text-gray-700 mb-8">
-              Khám phá các loại phòng và dịch vụ của chúng tôi, đặt phòng dễ dàng trực tuyến ngay hôm nay.
+              Khám phá các loại phòng và dịch vụ của chúng tôi, đặt phòng dễ
+              dàng trực tuyến ngay hôm nay.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button

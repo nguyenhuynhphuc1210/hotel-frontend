@@ -5,7 +5,7 @@ export default function ClientFooter() {
         {/* --- Cột 1: Giới thiệu --- */}
         <div>
           <h3 className="text-2xl font-bold mb-3 text-yellow-400">
-            🏨 Hotel Booking
+            🏨 Aurora Hotel
           </h3>
           <p className="text-gray-300 leading-relaxed">
             Khách sạn cao cấp với không gian sang trọng, dịch vụ chuyên nghiệp
@@ -58,7 +58,7 @@ export default function ClientFooter() {
 
       {/* --- Dòng bản quyền --- */}
       <div className="border-t border-gray-700 mt-8 pt-4 text-center text-gray-400 text-sm">
-        © {new Date().getFullYear()} <span className="text-yellow-400 font-semibold">Hotel Booking</span>.  
+        © {new Date().getFullYear()} <span className="text-yellow-400 font-semibold">Aurora Hotel</span>.  
         All rights reserved.
       </div>
     </footer>
