@@ -190,9 +190,7 @@ export default function Rooms() {
                 <td className="border px-4 py-2">
                   {room.images && room.images.length > 0 ? (
                     <img
-                      src={`${import.meta.env.VITE_API_URL}/storage/${
-                        room.images[0].image_path
-                      }`}
+                      src={room.images[0].image_path} // trực tiếp URL Cloudinary
                       alt={room.room_number}
                       className="w-16 h-16 object-cover rounded"
                     />
@@ -201,7 +199,9 @@ export default function Rooms() {
                   )}
                 </td>
                 <td className="border px-4 py-2">{room.room_number}</td>
-                <td className="border px-4 py-2">{getRoomTypeDisplay(room.type)}</td>
+                <td className="border px-4 py-2">
+                  {getRoomTypeDisplay(room.type)}
+                </td>
                 <td className="border px-4 py-2">
                   {Number(room.price).toLocaleString("vi-VN")} đ
                 </td>
