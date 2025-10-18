@@ -14,7 +14,7 @@ export default function ReviewForm() {
   useEffect(() => {
     const fetchBooking = async () => {
       try {
-        const res = await apiClient.get(`/bookings/${bookingId}`);
+        const res = await apiClient.get(`/my-bookings/${bookingId}`);
         console.log("Booking data:", res.data);
         setBooking(res.data);
       } catch (err) {
@@ -29,7 +29,7 @@ export default function ReviewForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await apiClient.post(`/bookings/${bookingId}/review`, {
+      await apiClient.post(`/my-bookings/${bookingId}/review`, {
         rating,
         comment,
       });
