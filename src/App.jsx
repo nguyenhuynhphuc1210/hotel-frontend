@@ -123,7 +123,7 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="about" element={<About />} />
           <Route path="change-password" element={<ChangePassword />} />
-          <Route path="/review/:bookingId" element={<ReviewForm />} />
+          <Route path="review/:bookingId" element={<ReviewForm />} />
         </Route>
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
