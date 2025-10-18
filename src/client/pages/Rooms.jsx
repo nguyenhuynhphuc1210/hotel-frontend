@@ -10,22 +10,37 @@ export default function Rooms() {
   const [sortBy, setSortBy] = useState("price-asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
+
   const navigate = useNavigate();
 
-  const fetchRooms = async (page = 1) => {
+  // Hàm fetch danh sách phòng
+  const fetchRooms = async (page = 1, type = "all") => {
     setLoading(true);
     try {
-      const res = await apiClient.get(`/rooms?status=available&page=${page}`);
-      setRooms(res.data.data);
-      setCurrentPage(res.data.current_page);
-      setLastPage(res.data.last_page);
+      let res;
+      if (type === "all") {
+        res = await apiClient.get(`/rooms?status=available&page=${page}`);
+        setRooms(res.data.data || []);
+        setCurrentPage(res.data.current_page || 1);
+        setLastPage(res.data.last_page || 1);
+      } else {
+        // API trả mảng trực tiếp khi lọc theo type
+        res = await apiClient.get(`/rooms?type=${type}`);
+        setRooms(res.data || []);
+        setCurrentPage(1);
+        setLastPage(1);
+      }
     } catch (err) {
       console.error("Fetch rooms error:", err);
+      setRooms([]);
+      setCurrentPage(1);
+      setLastPage(1);
     } finally {
       setLoading(false);
     }
   };
 
+  // Hàm fetch tất cả loại phòng
   const fetchAllRoomTypes = async () => {
     try {
       const res = await apiClient.get("/rooms?all=true");
@@ -41,29 +56,16 @@ export default function Rooms() {
     fetchAllRoomTypes();
   }, []);
 
-  const handleFilterType = async (type) => {
+  // Xử lý filter loại phòng
+  const handleFilterType = (type) => {
     setFilterType(type);
-    setLoading(true);
-
-    if (type === "all") {
-      await fetchRooms(1);
-    } else {
-      try {
-        const res = await apiClient.get(`/rooms?type=${type}`);
-        setRooms(res.data);
-        setLastPage(1);
-        setCurrentPage(1);
-      } catch (err) {
-        console.error("Fetch by type error:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    fetchRooms(1, type);
   };
 
+  // Lọc những phòng còn trống
   const availableRooms = rooms.filter((room) => room.status === "available");
 
-  // 🟢 Sắp xếp
+  // Sắp xếp phòng
   const sortedRooms = [...availableRooms].sort((a, b) => {
     if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
     if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
@@ -71,7 +73,7 @@ export default function Rooms() {
     return 0;
   });
 
-  // 🟢 Chuyển loại phòng sang tiếng Việt
+  // Nhãn loại phòng
   const getTypeLabel = (type) => {
     switch (type) {
       case "single":
@@ -102,9 +104,7 @@ export default function Rooms() {
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-2">Khám phá phòng nghỉ</h1>
-          <p className="text-blue-100">
-            Tìm phòng hoàn hảo cho kỳ nghỉ của bạn
-          </p>
+          <p className="text-blue-100">Tìm phòng hoàn hảo cho kỳ nghỉ của bạn</p>
         </div>
       </div>
 
@@ -177,7 +177,7 @@ export default function Rooms() {
                   >
                     {room.images && room.images.length > 0 ? (
                       <img
-                        src={room.images[0].image_path} // dùng trực tiếp URL Cloudinary
+                        src={room.images[0].image_path}
                         alt={room.room_number}
                         className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
@@ -232,7 +232,7 @@ export default function Rooms() {
               ))}
             </div>
 
-            {/* ✅ Phân trang */}
+            {/* Phân trang */}
             {filterType === "all" && lastPage > 1 && (
               <div className="flex justify-center mt-8 space-x-2">
                 {Array.from({ length: lastPage }, (_, i) => i + 1).map(
