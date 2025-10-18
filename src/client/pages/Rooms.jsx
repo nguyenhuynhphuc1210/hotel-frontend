@@ -11,7 +11,7 @@ export default function Rooms() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [allRooms, setAllRooms] = useState([]); // Lưu tất cả phòng
+  const [allRooms, setAllRooms] = useState([]);
   const navigate = useNavigate();
 
   // ================== FETCH PAGINATED ROOMS ==================
@@ -87,7 +87,6 @@ export default function Rooms() {
 
   // ================== FILTERED & SORTED ROOMS ==================
   const getDisplayRooms = () => {
-    // Nếu có tìm kiếm, lọc từ tất cả phòng
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       const searchedRooms = allRooms.filter((room) => {
@@ -96,7 +95,6 @@ export default function Rooms() {
         return roomNum.includes(query) || roomType.includes(query);
       });
 
-      // Sắp xếp
       const sorted = [...searchedRooms].sort((a, b) => {
         if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
         if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
@@ -107,7 +105,6 @@ export default function Rooms() {
       return sorted;
     }
 
-    // Không có tìm kiếm, dùng pagination bình thường
     const sorted = [...rooms].sort((a, b) => {
       if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
       if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
@@ -139,7 +136,8 @@ export default function Rooms() {
     const init = async () => {
       setLoading(true);
       await fetchAllAvailableRooms();
-      await fetchPaginatedRooms(1);
+      const paginatedRooms = await fetchPaginatedRooms(1);
+      setRooms(paginatedRooms);
       fetchAllRoomTypes();
       setLoading(false);
     };
@@ -305,7 +303,7 @@ export default function Rooms() {
                       <span className="text-2xl font-bold text-blue-600">
                         {Number(room.price).toLocaleString("vi-VN")}₫
                       </span>{" "}
-                      <span className="text-gray-500 text-sm">/ đêm</span>
+                      <span className="text-gray-500 text-sm">/ Đêm</span>
                     </div>
 
                     <div className="flex gap-2">
