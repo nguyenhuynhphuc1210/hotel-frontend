@@ -183,9 +183,7 @@ export default function RoomDetail() {
                   {/* Main Image */}
                   <div className="relative h-96 bg-gray-900">
                     <img
-                      src={`${import.meta.env.VITE_API_URL}/storage/${
-                        roomImages[currentImageIndex].image_path
-                      }`}
+                      src={roomImages[currentImageIndex].image_path}
                       alt={`Phòng ${room.room_number}`}
                       className="w-full h-full object-cover"
                     />
@@ -233,9 +231,7 @@ export default function RoomDetail() {
                           }`}
                         >
                           <img
-                            src={`${import.meta.env.VITE_API_URL}/storage/${
-                              img.image_path
-                            }`}
+                            src={img.image_path}
                             alt={`Thumbnail ${index}`}
                             className="w-full h-full object-cover"
                           />

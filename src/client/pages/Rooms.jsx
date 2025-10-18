@@ -177,9 +177,7 @@ export default function Rooms() {
                   >
                     {room.images && room.images.length > 0 ? (
                       <img
-                        src={`${import.meta.env.VITE_API_URL}/storage/${
-                          room.images[0].image_path
-                        }`}
+                        src={room.images[0].image_path} // dùng trực tiếp URL Cloudinary
                         alt={room.room_number}
                         className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
