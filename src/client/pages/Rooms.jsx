@@ -10,26 +10,16 @@ export default function Rooms() {
   const [sortBy, setSortBy] = useState("price-asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-
   const navigate = useNavigate();
 
-  // Hàm fetch danh sách phòng
-  const fetchRooms = async (page = 1, type = "all") => {
+  // ================== FETCH ROOMS ==================
+  const fetchRooms = async (page = 1) => {
     setLoading(true);
     try {
-      let res;
-      if (type === "all") {
-        res = await apiClient.get(`/rooms?status=available&page=${page}`);
-        setRooms(res.data.data || []);
-        setCurrentPage(res.data.current_page || 1);
-        setLastPage(res.data.last_page || 1);
-      } else {
-        // API trả mảng trực tiếp khi lọc theo type
-        res = await apiClient.get(`/rooms?type=${type}`);
-        setRooms(res.data || []);
-        setCurrentPage(1);
-        setLastPage(1);
-      }
+      const res = await apiClient.get(`/rooms?status=available&page=${page}`);
+      setRooms(Array.isArray(res.data.data) ? res.data.data : []);
+      setCurrentPage(res.data.current_page || 1);
+      setLastPage(res.data.last_page || 1);
     } catch (err) {
       console.error("Fetch rooms error:", err);
       setRooms([]);
@@ -40,7 +30,7 @@ export default function Rooms() {
     }
   };
 
-  // Hàm fetch tất cả loại phòng
+  // ================== FETCH ALL ROOM TYPES ==================
   const fetchAllRoomTypes = async () => {
     try {
       const res = await apiClient.get("/rooms?all=true");
@@ -51,21 +41,37 @@ export default function Rooms() {
     }
   };
 
-  useEffect(() => {
-    fetchRooms(1);
-    fetchAllRoomTypes();
-  }, []);
-
-  // Xử lý filter loại phòng
-  const handleFilterType = (type) => {
+  // ================== HANDLE FILTER ==================
+  const handleFilterType = async (type) => {
     setFilterType(type);
-    fetchRooms(1, type);
+    setLoading(true);
+
+    try {
+      if (type === "all") {
+        await fetchRooms(1);
+      } else {
+        const res = await apiClient.get(
+          `/rooms?status=available&type=${type}&page=1`
+        );
+        setRooms(Array.isArray(res.data.data) ? res.data.data : []);
+        setCurrentPage(res.data.current_page || 1);
+        setLastPage(res.data.last_page || 1);
+      }
+    } catch (err) {
+      console.error("Fetch by type error:", err);
+      setRooms([]);
+      setCurrentPage(1);
+      setLastPage(1);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Lọc những phòng còn trống
-  const availableRooms = rooms.filter((room) => room.status === "available");
+  // ================== SORTED & FILTERED ROOMS ==================
+  const availableRooms = Array.isArray(rooms)
+    ? rooms.filter((room) => room.status === "available")
+    : [];
 
-  // Sắp xếp phòng
   const sortedRooms = [...availableRooms].sort((a, b) => {
     if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
     if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
@@ -73,7 +79,6 @@ export default function Rooms() {
     return 0;
   });
 
-  // Nhãn loại phòng
   const getTypeLabel = (type) => {
     switch (type) {
       case "single":
@@ -87,6 +92,13 @@ export default function Rooms() {
     }
   };
 
+  // ================== INITIAL LOAD ==================
+  useEffect(() => {
+    fetchRooms(1);
+    fetchAllRoomTypes();
+  }, []);
+
+  // ================== LOADING UI ==================
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -98,6 +110,7 @@ export default function Rooms() {
     );
   }
 
+  // ================== RENDER ==================
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -109,10 +122,9 @@ export default function Rooms() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Bộ lọc & sắp xếp */}
+        {/* Filter & Sort */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            {/* Filter by Type */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-gray-700 font-medium">Loại phòng:</span>
               {["all", ...allRoomTypes].map((type) => (
@@ -130,7 +142,6 @@ export default function Rooms() {
               ))}
             </div>
 
-            {/* Sort */}
             <div className="flex items-center gap-2">
               <span className="text-gray-700 font-medium">Sắp xếp:</span>
               <select
@@ -146,7 +157,7 @@ export default function Rooms() {
           </div>
         </div>
 
-        {/* Danh sách phòng */}
+        {/* Room list */}
         {sortedRooms.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <div className="text-6xl mb-4">🏨</div>
@@ -232,7 +243,7 @@ export default function Rooms() {
               ))}
             </div>
 
-            {/* Phân trang */}
+            {/* Pagination */}
             {filterType === "all" && lastPage > 1 && (
               <div className="flex justify-center mt-8 space-x-2">
                 {Array.from({ length: lastPage }, (_, i) => i + 1).map(
