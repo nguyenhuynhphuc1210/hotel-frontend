@@ -11,23 +11,32 @@ export default function Rooms() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [allRooms, setAllRooms] = useState([]); // Lưu tất cả phòng
   const navigate = useNavigate();
 
-  // ================== FETCH ROOMS ==================
-  const fetchRooms = async (page = 1) => {
-    setLoading(true);
+  // ================== FETCH PAGINATED ROOMS ==================
+  const fetchPaginatedRooms = async (page = 1) => {
     try {
       const res = await apiClient.get(`/rooms?status=available&page=${page}`);
-      setRooms(Array.isArray(res.data.data) ? res.data.data : []);
       setCurrentPage(res.data.current_page || 1);
       setLastPage(res.data.last_page || 1);
+      return Array.isArray(res.data.data) ? res.data.data : [];
     } catch (err) {
-      console.error("Fetch rooms error:", err);
-      setRooms([]);
-      setCurrentPage(1);
-      setLastPage(1);
-    } finally {
-      setLoading(false);
+      console.error("Fetch paginated rooms error:", err);
+      return [];
+    }
+  };
+
+  // ================== FETCH ALL AVAILABLE ROOMS ==================
+  const fetchAllAvailableRooms = async () => {
+    try {
+      const res = await apiClient.get("/rooms?status=available&all=true");
+      setAllRooms(Array.isArray(res.data) ? res.data : []);
+      return Array.isArray(res.data) ? res.data : [];
+    } catch (err) {
+      console.error("Fetch all available rooms error:", err);
+      setAllRooms([]);
+      return [];
     }
   };
 
@@ -51,7 +60,7 @@ export default function Rooms() {
 
     try {
       if (type === "all") {
-        await fetchRooms(1);
+        setRooms(await fetchPaginatedRooms(1));
       } else {
         const res = await apiClient.get(
           `/rooms?status=available&type=${type}&page=1`
@@ -77,24 +86,40 @@ export default function Rooms() {
   };
 
   // ================== FILTERED & SORTED ROOMS ==================
-  const availableRooms = Array.isArray(rooms)
-    ? rooms.filter((room) => room.status === "available")
-    : [];
+  const getDisplayRooms = () => {
+    // Nếu có tìm kiếm, lọc từ tất cả phòng
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const searchedRooms = allRooms.filter((room) => {
+        const roomNum = String(room.room_number).toLowerCase();
+        const roomType = room.type ? String(room.type).toLowerCase() : "";
+        return roomNum.includes(query) || roomType.includes(query);
+      });
 
-  const searchedRooms = availableRooms.filter((room) => {
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return true;
-    const roomNum = String(room.room_number).toLowerCase();
-    const roomType = room.type ? String(room.type).toLowerCase() : "";
-    return roomNum.includes(query) || roomType.includes(query);
-  });
+      // Sắp xếp
+      const sorted = [...searchedRooms].sort((a, b) => {
+        if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
+        if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
+        if (sortBy === "name") return a.room_number.localeCompare(b.room_number);
+        return 0;
+      });
 
-  const sortedRooms = [...searchedRooms].sort((a, b) => {
-    if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
-    if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
-    if (sortBy === "name") return a.room_number.localeCompare(b.room_number);
-    return 0;
-  });
+      return sorted;
+    }
+
+    // Không có tìm kiếm, dùng pagination bình thường
+    const sorted = [...rooms].sort((a, b) => {
+      if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
+      if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
+      if (sortBy === "name") return a.room_number.localeCompare(b.room_number);
+      return 0;
+    });
+
+    return sorted;
+  };
+
+  const sortedRooms = getDisplayRooms();
+  const isSearching = searchQuery.trim() !== "";
 
   const getTypeLabel = (type) => {
     switch (type) {
@@ -111,8 +136,14 @@ export default function Rooms() {
 
   // ================== INITIAL LOAD ==================
   useEffect(() => {
-    fetchRooms(1);
-    fetchAllRoomTypes();
+    const init = async () => {
+      setLoading(true);
+      await fetchAllAvailableRooms();
+      await fetchPaginatedRooms(1);
+      fetchAllRoomTypes();
+      setLoading(false);
+    };
+    init();
   }, []);
 
   // ================== LOADING UI ==================
@@ -205,9 +236,7 @@ export default function Rooms() {
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <div className="text-6xl mb-4">🏨</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {searchQuery
-                ? "Không tìm thấy phòng phù hợp"
-                : "Không tìm thấy phòng phù hợp"}
+              Không tìm thấy phòng phù hợp
             </h3>
             <p className="text-gray-600 mb-4">
               {searchQuery
@@ -228,6 +257,7 @@ export default function Rooms() {
           <>
             <div className="mb-4 text-sm text-gray-600">
               Tìm thấy <span className="font-semibold text-gray-900">{sortedRooms.length}</span> phòng
+              {isSearching && ` (tìm kiếm: "${searchQuery}")`}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -275,7 +305,7 @@ export default function Rooms() {
                       <span className="text-2xl font-bold text-blue-600">
                         {Number(room.price).toLocaleString("vi-VN")}₫
                       </span>{" "}
-                      <span className="text-gray-500 text-sm">/ Đêm</span>
+                      <span className="text-gray-500 text-sm">/ đêm</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -297,14 +327,14 @@ export default function Rooms() {
               ))}
             </div>
 
-            {/* Pagination */}
-            {filterType === "all" && lastPage > 1 && searchQuery === "" && (
+            {/* Pagination - chỉ hiển thị khi không search */}
+            {!isSearching && filterType === "all" && lastPage > 1 && (
               <div className="flex justify-center mt-8 space-x-2">
                 {Array.from({ length: lastPage }, (_, i) => i + 1).map(
                   (page) => (
                     <button
                       key={page}
-                      onClick={() => fetchRooms(page)}
+                      onClick={() => fetchPaginatedRooms(page).then(setRooms)}
                       className={`px-4 py-2 rounded-lg ${
                         page === currentPage
                           ? "bg-blue-600 text-white"
