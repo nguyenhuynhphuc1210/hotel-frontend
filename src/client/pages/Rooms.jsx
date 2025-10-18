@@ -10,6 +10,7 @@ export default function Rooms() {
   const [sortBy, setSortBy] = useState("price-asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   // ================== FETCH ROOMS ==================
@@ -44,6 +45,8 @@ export default function Rooms() {
   // ================== HANDLE FILTER ==================
   const handleFilterType = async (type) => {
     setFilterType(type);
+    setCurrentPage(1);
+    setSearchQuery("");
     setLoading(true);
 
     try {
@@ -67,12 +70,27 @@ export default function Rooms() {
     }
   };
 
-  // ================== SORTED & FILTERED ROOMS ==================
+  // ================== HANDLE SEARCH ==================
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // ================== FILTERED & SORTED ROOMS ==================
   const availableRooms = Array.isArray(rooms)
     ? rooms.filter((room) => room.status === "available")
     : [];
 
-  const sortedRooms = [...availableRooms].sort((a, b) => {
+  const searchedRooms = availableRooms.filter((room) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      room.room_number.toLowerCase().includes(query) ||
+      getTypeLabel(room.type).toLowerCase().includes(query)
+    );
+  });
+
+  const sortedRooms = [...searchedRooms].sort((a, b) => {
     if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
     if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
     if (sortBy === "name") return a.room_number.localeCompare(b.room_number);
@@ -82,9 +100,9 @@ export default function Rooms() {
   const getTypeLabel = (type) => {
     switch (type) {
       case "single":
-        return "Phòng đơn";
+        return "Phòng Đơn";
       case "double":
-        return "Phòng đôi";
+        return "Phòng Đôi";
       case "suite":
         return "Phòng VIP";
       default:
@@ -122,6 +140,32 @@ export default function Rooms() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search Bar */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo số phòng hoặc loại phòng..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <svg
+              className="absolute right-3 top-3.5 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
         {/* Filter & Sort */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -162,13 +206,20 @@ export default function Rooms() {
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <div className="text-6xl mb-4">🏨</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Không tìm thấy phòng phù hợp
+              {searchQuery
+                ? "Không tìm thấy phòng phù hợp"
+                : "Không tìm thấy phòng phù hợp"}
             </h3>
             <p className="text-gray-600 mb-4">
-              Hiện tại không có phòng trống với bộ lọc đã chọn
+              {searchQuery
+                ? `Không có phòng nào khớp với tìm kiếm "${searchQuery}"`
+                : "Hiện tại không có phòng trống với bộ lọc đã chọn"}
             </p>
             <button
-              onClick={() => handleFilterType("all")}
+              onClick={() => {
+                handleFilterType("all");
+                setSearchQuery("");
+              }}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               Xem tất cả phòng
@@ -176,6 +227,10 @@ export default function Rooms() {
           </div>
         ) : (
           <>
+            <div className="mb-4 text-sm text-gray-600">
+              Tìm thấy <span className="font-semibold text-gray-900">{sortedRooms.length}</span> phòng
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedRooms.map((room) => (
                 <div
@@ -221,7 +276,7 @@ export default function Rooms() {
                       <span className="text-2xl font-bold text-blue-600">
                         {Number(room.price).toLocaleString("vi-VN")}₫
                       </span>{" "}
-                      <span className="text-gray-500 text-sm">/ đêm</span>
+                      <span className="text-gray-500 text-sm">/ Đêm</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -244,7 +299,7 @@ export default function Rooms() {
             </div>
 
             {/* Pagination */}
-            {filterType === "all" && lastPage > 1 && (
+            {filterType === "all" && lastPage > 1 && searchQuery === "" && (
               <div className="flex justify-center mt-8 space-x-2">
                 {Array.from({ length: lastPage }, (_, i) => i + 1).map(
                   (page) => (
