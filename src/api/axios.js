@@ -20,7 +20,7 @@ apiClient.interceptors.request.use((config) => {
 
 // ---------------- ADMIN API ----------------
 export const apiAdmin = axios.create({
-  baseURL: "https://hotel-api-7wfh.onrender.com/api",
+  baseURL: "https://hotel-api-x4yv.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
