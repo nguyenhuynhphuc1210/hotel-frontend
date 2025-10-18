@@ -15,6 +15,7 @@ export default function ReviewForm() {
     const fetchBooking = async () => {
       try {
         const res = await apiClient.get(`/bookings/${bookingId}`);
+        console.log("Booking data:", res.data);
         setBooking(res.data);
       } catch (err) {
         console.error(err);
@@ -44,7 +45,9 @@ export default function ReviewForm() {
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Đánh giá phòng {booking.room?.room_number}</h2>
+      <h2 className="text-2xl font-bold mb-4">
+        Đánh giá phòng {booking.room?.room_number}
+      </h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
@@ -55,7 +58,9 @@ export default function ReviewForm() {
             className="w-full border px-3 py-2 rounded"
           >
             {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>{n} sao</option>
+              <option key={n} value={n}>
+                {n} sao
+              </option>
             ))}
           </select>
         </div>
