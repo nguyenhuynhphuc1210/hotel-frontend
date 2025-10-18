@@ -188,6 +188,15 @@ export default function MyBookings() {
                           Hủy phòng
                         </button>
                       )}
+
+                      {isPaid && b.status !== "cancelled" && (
+                        <Link
+                          to={`/review/${b.id}`}
+                          className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 text-xs"
+                        >
+                          Đánh giá
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 );

@@ -45,6 +45,7 @@ import Pay from "./client/pages/Pay";
 import MyBookingDetail from "./client/pages/MyBookingDetail";
 import ClientProfile from "./client/pages/ClientProfile";
 import ForgotPassword from "./client/pages/ForgotPassword";
+import ReviewBooking from "./client/pages/ReviewBooking";
 
 import Login from "./admin/pages/Login";
 import LoginClient from "./client/pages/LoginClient";
@@ -122,6 +123,7 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="about" element={<About />} />
           <Route path="change-password" element={<ChangePassword />} />
+          <Route path="review/:bookingId" element={<ReviewBooking />} />
         </Route>
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
