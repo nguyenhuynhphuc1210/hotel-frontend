@@ -84,10 +84,9 @@ export default function Rooms() {
   const searchedRooms = availableRooms.filter((room) => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
-    return (
-      room.room_number.toLowerCase().includes(query) ||
-      getTypeLabel(room.type).toLowerCase().includes(query)
-    );
+    const roomNum = String(room.room_number).toLowerCase();
+    const roomType = room.type ? String(room.type).toLowerCase() : "";
+    return roomNum.includes(query) || roomType.includes(query);
   });
 
   const sortedRooms = [...searchedRooms].sort((a, b) => {
