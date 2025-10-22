@@ -55,7 +55,7 @@ export default function ClientHeader() {
       localStorage.removeItem("client_token");
       setUser(null);
       setOpenMenu(false);
-      navigate("/login");
+      navigate("/");
     }
   };
 
