@@ -503,16 +503,6 @@ export default function RoomDetail() {
                       </button>
                     </div>
                   </div>
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                        Đánh giá & Nhận xét
-                      </h3>
-
-                      {/* Hiển thị trung bình sao và danh sách review */}
-                      <RoomReviews roomId={room.id} />
-                    </div>
-                  </div>
                 </>
               ) : (
                 <div className="text-center py-8">
@@ -533,6 +523,16 @@ export default function RoomDetail() {
               )}
             </div>
           </div>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            Đánh giá & Nhận xét
+          </h3>
+
+          {/* Hiển thị trung bình sao và danh sách review */}
+          <RoomReviews roomId={room.id} />
         </div>
       </div>
     </div>
