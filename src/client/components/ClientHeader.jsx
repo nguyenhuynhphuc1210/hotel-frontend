@@ -79,8 +79,14 @@ export default function ClientHeader() {
             >
               <div className="text-4xl">🏨</div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Aurora Hotel</h1>
-                <p className={`text-xs ${scrolled ? "text-gray-600" : "text-blue-100"}`}>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  Aurora Hotel
+                </h1>
+                <p
+                  className={`text-xs ${
+                    scrolled ? "text-gray-600" : "text-blue-100"
+                  }`}
+                >
                   Luxury & Comfort
                 </p>
               </div>
@@ -123,9 +129,13 @@ export default function ClientHeader() {
                         : "bg-white bg-opacity-20 text-white hover:bg-opacity-30"
                     }`}
                   >
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg ${
-                      scrolled ? "bg-blue-600 text-white" : "bg-white text-blue-600"
-                    }`}>
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-lg ${
+                        scrolled
+                          ? "bg-blue-600 text-white"
+                          : "bg-white text-blue-600"
+                      }`}
+                    >
                       👤
                     </div>
                     <span className="max-w-32 truncate">{user.fullname}</span>
@@ -207,16 +217,29 @@ export default function ClientHeader() {
                   )}
                 </div>
               ) : (
-                <NavLink
-                  to="/login"
-                  className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
-                    scrolled
-                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                      : "bg-white text-blue-600 hover:bg-blue-50 shadow-md"
-                  }`}
-                >
-                  Đăng nhập
-                </NavLink>
+                <div className="flex items-center gap-3">
+                  <NavLink
+                    to="/login"
+                    className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                      scrolled
+                        ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                        : "bg-white text-blue-600 hover:bg-blue-50 shadow-md"
+                    }`}
+                  >
+                    Đăng nhập
+                  </NavLink>
+
+                  <NavLink
+                    to="/register"
+                    className={`px-6 py-2.5 rounded-lg font-semibold border transition-all duration-200 ${
+                      scrolled
+                        ? "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                        : "border-white text-white hover:bg-white hover:text-blue-600"
+                    }`}
+                  >
+                    Đăng ký
+                  </NavLink>
+                </div>
               )}
             </div>
 
@@ -282,9 +305,11 @@ export default function ClientHeader() {
 
               {user ? (
                 <div className="mt-4 space-y-1">
-                  <div className={`px-4 py-2 rounded-lg font-semibold ${
-                    scrolled ? "text-gray-900" : "text-white"
-                  }`}>
+                  <div
+                    className={`px-4 py-2 rounded-lg font-semibold ${
+                      scrolled ? "text-gray-900" : "text-white"
+                    }`}
+                  >
                     👤 {user.fullname}
                   </div>
                   <button
@@ -293,7 +318,9 @@ export default function ClientHeader() {
                       navigate("/profile");
                     }}
                     className={`w-full text-left px-4 py-2.5 rounded-lg ${
-                      scrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white hover:bg-opacity-10"
+                      scrolled
+                        ? "text-gray-700 hover:bg-gray-100"
+                        : "text-white hover:bg-white hover:bg-opacity-10"
                     }`}
                   >
                     🧍 Hồ sơ cá nhân
@@ -304,7 +331,9 @@ export default function ClientHeader() {
                       navigate("/my-bookings");
                     }}
                     className={`w-full text-left px-4 py-2.5 rounded-lg ${
-                      scrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white hover:bg-opacity-10"
+                      scrolled
+                        ? "text-gray-700 hover:bg-gray-100"
+                        : "text-white hover:bg-white hover:bg-opacity-10"
                     }`}
                   >
                     📑 Phòng đã đặt
@@ -315,7 +344,9 @@ export default function ClientHeader() {
                       navigate("/change-password");
                     }}
                     className={`w-full text-left px-4 py-2.5 rounded-lg ${
-                      scrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white hover:bg-opacity-10"
+                      scrolled
+                        ? "text-gray-700 hover:bg-gray-100"
+                        : "text-white hover:bg-white hover:bg-opacity-10"
                     }`}
                   >
                     🔒 Đổi mật khẩu
@@ -323,30 +354,46 @@ export default function ClientHeader() {
                   <button
                     onClick={handleLogout}
                     className={`w-full text-left px-4 py-2.5 rounded-lg font-medium ${
-                      scrolled ? "text-red-600 hover:bg-red-50" : "text-red-200 hover:bg-white hover:bg-opacity-10"
+                      scrolled
+                        ? "text-red-600 hover:bg-red-50"
+                        : "text-red-200 hover:bg-white hover:bg-opacity-10"
                     }`}
                   >
                     🚪 Đăng xuất
                   </button>
                 </div>
               ) : (
-                <NavLink
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block mt-4 px-4 py-2.5 rounded-lg font-semibold text-center ${
-                    scrolled
-                      ? "bg-blue-600 text-white"
-                      : "bg-white text-blue-600"
-                  }`}
-                >
-                  Đăng nhập
-                </NavLink>
+                <div className="mt-4 flex flex-col items-center">
+                  <NavLink
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`w-40 px-4 py-2.5 rounded-lg font-semibold text-center transition-all duration-200 ${
+                      scrolled
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
+                        : "bg-white text-blue-600 hover:bg-blue-50"
+                    }`}
+                  >
+                    Đăng nhập
+                  </NavLink>
+
+                  <NavLink
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`w-40 mt-2 px-4 py-2.5 rounded-lg font-semibold text-center border transition-all duration-200 ${
+                      scrolled
+                        ? "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                        : "border-white text-white hover:bg-white hover:text-blue-600"
+                    }`}
+                  >
+                    Đăng ký
+                  </NavLink>
+                </div>
               )}
             </div>
           )}
         </div>
       </header>
-      
+
       {/* Spacer để tránh content bị che bởi fixed header */}
       <div className="h-20"></div>
     </>
