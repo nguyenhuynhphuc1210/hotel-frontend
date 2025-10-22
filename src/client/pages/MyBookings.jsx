@@ -189,12 +189,20 @@ export default function MyBookings() {
                         </button>
                       )}
                       {isPaid && (
-                        <Link
-                          to={`/review/${b.id}`}
-                          className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 text-xs"
-                        >
-                          Đánh giá
-                        </Link>
+                        <>
+                          {b.review ? (
+                            <span className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs">
+                              Đã đánh giá
+                            </span>
+                          ) : (
+                            <Link
+                              to={`/review/${b.id}`}
+                              className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 text-xs"
+                            >
+                              Đánh giá
+                            </Link>
+                          )}
+                        </>
                       )}
                     </td>
                   </tr>
