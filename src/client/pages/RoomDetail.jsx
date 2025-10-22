@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiClient } from "../../api/axios";
 import { toast } from "react-toastify";
+import RoomReviews from "./RoomReviews";
 
 export default function RoomDetail() {
   const { id } = useParams();
@@ -500,6 +501,16 @@ export default function RoomDetail() {
                       >
                         Quay lại
                       </button>
+                    </div>
+                  </div>
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                        Đánh giá & Nhận xét
+                      </h3>
+
+                      {/* Hiển thị trung bình sao và danh sách review */}
+                      <RoomReviews roomId={room.id} />
                     </div>
                   </div>
                 </>
