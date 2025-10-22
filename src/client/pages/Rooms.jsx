@@ -98,7 +98,8 @@ export default function Rooms() {
       const sorted = [...searchedRooms].sort((a, b) => {
         if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
         if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
-        if (sortBy === "name") return a.room_number.localeCompare(b.room_number);
+        if (sortBy === "name")
+          return a.room_number.localeCompare(b.room_number);
         return 0;
       });
 
@@ -144,6 +145,28 @@ export default function Rooms() {
     init();
   }, []);
 
+  const handlePageChange = async (page) => {
+    setLoading(true);
+    try {
+      let res;
+      if (filterType === "all") {
+        res = await apiClient.get(`/rooms?status=available&page=${page}`);
+      } else {
+        res = await apiClient.get(
+          `/rooms?status=available&type=${filterType}&page=${page}`
+        );
+      }
+      const roomsData = Array.isArray(res.data.data) ? res.data.data : [];
+      setRooms(roomsData);
+      setCurrentPage(res.data.current_page || page);
+      setLastPage(res.data.last_page || 1);
+    } catch (err) {
+      console.error("Fetch rooms error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ================== LOADING UI ==================
   if (loading) {
     return (
@@ -163,7 +186,9 @@ export default function Rooms() {
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-2">Khám phá phòng nghỉ</h1>
-          <p className="text-blue-100">Tìm phòng hoàn hảo cho kỳ nghỉ của bạn</p>
+          <p className="text-blue-100">
+            Tìm phòng hoàn hảo cho kỳ nghỉ của bạn
+          </p>
         </div>
       </div>
 
@@ -254,7 +279,11 @@ export default function Rooms() {
         ) : (
           <>
             <div className="mb-4 text-sm text-gray-600">
-              Tìm thấy <span className="font-semibold text-gray-900">{sortedRooms.length}</span> phòng
+              Tìm thấy{" "}
+              <span className="font-semibold text-gray-900">
+                {sortedRooms.length}
+              </span>{" "}
+              phòng
               {isSearching && ` (tìm kiếm: "${searchQuery}")`}
             </div>
 
@@ -326,23 +355,95 @@ export default function Rooms() {
             </div>
 
             {/* Pagination - chỉ hiển thị khi không search */}
-            {!isSearching && filterType === "all" && lastPage > 1 && (
+            {/* Pagination - hiển thị khi không search và lastPage > 1 */}
+            {!isSearching && lastPage > 1 && (
               <div className="flex justify-center mt-8 space-x-2">
-                {Array.from({ length: lastPage }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => fetchPaginatedRooms(page).then(setRooms)}
-                      className={`px-4 py-2 rounded-lg ${
-                        page === currentPage
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
+                {/* Nút Previous */}
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className={`px-4 py-2 rounded-lg ${
+                    currentPage === 1
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  &lt;
+                </button>
+
+                {/* Hiển thị giới hạn số trang */}
+                {(() => {
+                  const pages = [];
+                  const maxVisible = 5; // Số nút hiển thị tối đa
+                  let start = Math.max(
+                    1,
+                    currentPage - Math.floor(maxVisible / 2)
+                  );
+                  let end = Math.min(lastPage, start + maxVisible - 1);
+
+                  if (end - start < maxVisible - 1) {
+                    start = Math.max(1, end - maxVisible + 1);
+                  }
+
+                  if (start > 1) {
+                    pages.push(
+                      <button
+                        key={1}
+                        onClick={() => handlePageChange(1)}
+                        className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                      >
+                        1
+                      </button>
+                    );
+                    if (start > 2)
+                      pages.push(<span key="start-ellipsis">...</span>);
+                  }
+
+                  for (let page = start; page <= end; page++) {
+                    pages.push(
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-4 py-2 rounded-lg ${
+                          page === currentPage
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 hover:bg-gray-300"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+
+                  if (end < lastPage) {
+                    if (end < lastPage - 1)
+                      pages.push(<span key="end-ellipsis">...</span>);
+                    pages.push(
+                      <button
+                        key={lastPage}
+                        onClick={() => handlePageChange(lastPage)}
+                        className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                      >
+                        {lastPage}
+                      </button>
+                    );
+                  }
+
+                  return pages;
+                })()}
+
+                {/* Nút Next */}
+                <button
+                  disabled={currentPage === lastPage}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className={`px-4 py-2 rounded-lg ${
+                    currentPage === lastPage
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  &gt;
+                </button>
               </div>
             )}
           </>
