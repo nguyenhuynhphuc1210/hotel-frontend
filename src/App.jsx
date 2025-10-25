@@ -46,6 +46,7 @@ import MyBookingDetail from "./client/pages/MyBookingDetail";
 import ClientProfile from "./client/pages/ClientProfile";
 import ForgotPassword from "./client/pages/ForgotPassword";
 import ReviewForm from "./client/pages/ReviewForm";
+import PaymentSuccess from "./client/pages/PaymentSuccess";
 
 import Login from "./admin/pages/Login";
 import LoginClient from "./client/pages/LoginClient";
@@ -55,6 +56,7 @@ import PrivateRoute from "./admin/components/PrivateRoute";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 
 function App() {
   return (
@@ -118,6 +120,7 @@ function App() {
           <Route path="pay" element={<Pay />} />
           <Route path="my-bookings/:id" element={<MyBookingDetail />} />
           <Route path="profile" element={<ClientProfile />} />
+          <Route path="payment-success" element={<PaymentSuccess />} />
 
           <Route path="services" element={<ServicesClient />} />
           <Route path="contact" element={<Contact />} />
