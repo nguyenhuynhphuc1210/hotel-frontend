@@ -164,15 +164,16 @@ export default function MyBookings() {
                         Chi tiết
                       </Link>
 
-                      {!isPaid && remain > 0 && (
+                      {!isPaid && remain > 0 && b.status !== "cancelled" && (
                         <Link
-                          to="/pay"
+                          to="/payment"
                           state={{
                             room: b.room,
                             form: b,
                             total: b.total_price,
-                            deposit: remain,
+                            deposit: deposit,
                             invoiceId: b.invoice?.id,
+                            bookingId: b.id,
                           }}
                           className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 text-xs"
                         >

@@ -105,7 +105,7 @@ export default function RoomDetail() {
     }
   };
   // Thanh toán
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     if (
       !form.fullname ||
       !form.phone ||
@@ -117,28 +117,30 @@ export default function RoomDetail() {
       toast.error("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
-    if (new Date(form.checkout_date) <= new Date(form.checkin_date)) {
-      toast.error("Ngày trả phòng phải sau ngày nhận phòng!");
-      return;
+
+    try {
+      // Kiểm tra xem đã có customer_id chưa
+      let customerId = localStorage.getItem("customer_id");
+
+      if (!customerId) {
+        // Tạo mới customer
+        const res = await apiClient.post("/customers", {
+          fullname: form.fullname,
+          email: form.email,
+          phone: form.phone,
+          cccd: form.cccd,
+        });
+        customerId = res.data.id; // lấy id từ response
+        localStorage.setItem("customer_id", customerId);
+      }
+
+      navigate("/paymentdeposit", {
+        state: { room, form, selectedServices, total, customer_id: customerId },
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Lỗi tạo khách hàng, vui lòng thử lại");
     }
-
-    const savedUser = JSON.parse(localStorage.getItem("client_user") || "null");
-
-    if (!savedUser) {
-      toast.info(
-        "Bạn chưa đăng nhập. Vui lòng đăng ký tài khoản bằng email này để theo dõi đặt phòng trong 'Đặt phòng của tôi'.",
-        { autoClose: 7000 }
-      );
-    } else if (savedUser.email !== form.email) {
-      toast.warn(
-        "Email đặt phòng khác với email tài khoản hiện tại. Vui lòng đăng nhập bằng đúng email để theo dõi đặt phòng.",
-        { autoClose: 7000 }
-      );
-    }
-
-    navigate("/payment", {
-      state: { room, form, selectedServices, total },
-    });
   };
 
   if (!room)

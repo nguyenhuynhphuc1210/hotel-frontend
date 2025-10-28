@@ -38,15 +38,15 @@ import RoomDetail from "./client/pages/RoomDetail";
 import ServicesClient from "./client/pages/Services";
 import About from "./client/pages/About";
 import Contact from "./client/pages/Contact";
-import Payment from "./client/pages/Payment";
-import PaymentGateway from "./client/pages/PaymentGateway";
+import PaymentDeposit from "./client/pages/PaymentDeposit";
 import MyBookings from "./client/pages/MyBookings";
-import Pay from "./client/pages/Pay";
+import Payment from "./client/pages/Payment";
 import MyBookingDetail from "./client/pages/MyBookingDetail";
 import ClientProfile from "./client/pages/ClientProfile";
 import ForgotPassword from "./client/pages/ForgotPassword";
 import ReviewForm from "./client/pages/ReviewForm";
 import PaymentSuccess from "./client/pages/PaymentSuccess";
+import PaymentRemainingSuccess from "./client/pages/PaymentRemainingSuccess";
 
 import Login from "./admin/pages/Login";
 import LoginClient from "./client/pages/LoginClient";
@@ -114,13 +114,13 @@ function App() {
           <Route index element={<Home />} />
           <Route path="rooms" element={<RoomsClient />} />
           <Route path="rooms/:id" element={<RoomDetail />} />
-          <Route path="payment" element={<Payment />} />
-          <Route path="payment-gateway" element={<PaymentGateway />} />
+          <Route path="paymentdeposit" element={<PaymentDeposit />} />
           <Route path="my-bookings" element={<MyBookings />} />
-          <Route path="pay" element={<Pay />} />
+          <Route path="payment" element={<Payment />} />
           <Route path="my-bookings/:id" element={<MyBookingDetail />} />
           <Route path="profile" element={<ClientProfile />} />
           <Route path="payment-success" element={<PaymentSuccess />} />
+          <Route path="payment-remaining-success" element={<PaymentRemainingSuccess />} />
 
           <Route path="services" element={<ServicesClient />} />
           <Route path="contact" element={<Contact />} />

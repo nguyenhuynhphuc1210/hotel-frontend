@@ -1,80 +1,49 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { apiClient } from "../../api/axios";
 
 export default function PaymentSuccess() {
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [status, setStatus] = useState("loading");
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    // ✅ Lấy tham số trả về từ MoMo
-    const resultCode = searchParams.get("resultCode");
-    const message = searchParams.get("message");
+    const params = new URLSearchParams(location.search);
+    const data = Object.fromEntries(params.entries());
 
-    if (resultCode === "0") {
-      setStatus("success");
-      setMessage("Thanh toán thành công! Cảm ơn bạn đã đặt phòng.");
+    // Xác định phương thức thanh toán
+    if (data.vnp_ResponseCode !== undefined) {
+      // VNPay
+      apiClient.post("/payment/vnpay/return", data)
+        .then(res => handleResponse(res))
+        .catch(err => handleError(err));
+    } else if (data.resultCode !== undefined) {
+      // MoMo
+      apiClient.post("/payment/momo/return", data)
+        .then(res => handleResponse(res))
+        .catch(err => handleError(err));
     } else {
-      setStatus("failed");
-      setMessage(`Thanh toán thất bại: ${message || "Không rõ lý do."}`);
+      toast.error("Không xác định được phương thức thanh toán");
+      navigate("/rooms");
     }
 
-    // (Tùy chọn) Nếu bạn muốn lấy thông tin booking mới tạo
-    // gọi API backend của bạn, ví dụ:
-    // fetch(`${import.meta.env.VITE_API_URL}/api/bookings/latest`)
-    //   .then(res => res.json())
-    //   .then(data => setBooking(data))
-    //   .catch(err => console.error(err));
-  }, [searchParams]);
+    function handleResponse(res) {
+      if (res.data.status === "success") {
+        toast.success("Đặt phòng thành công!");
+        navigate("/my-bookings");
+      } else {
+        toast.error(res.data.message || "Thanh toán không thành công");
+        navigate("/rooms");
+      }
+    }
 
-  const handleBack = () => {
-    navigate("/my-bookings");
-  };
+    function handleError(err) {
+      console.error(err);
+      toast.error("Lỗi xử lý thanh toán");
+      navigate("/rooms");
+    }
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-      <div className="bg-white shadow-lg rounded-2xl p-10 w-[420px] text-center">
-        {status === "loading" && <p>Đang xử lý thanh toán...</p>}
+  }, [location, navigate]);
 
-        {status === "success" && (
-          <>
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
-              alt="Success"
-              className="w-20 mx-auto mb-4"
-            />
-            <h2 className="text-2xl font-bold text-green-600 mb-2">Thanh toán thành công!</h2>
-            <p className="text-gray-700 mb-6">
-              Cảm ơn bạn đã thanh toán. Mã đơn hàng: <b>{searchParams.get("orderId")}</b>
-            </p>
-            <button
-              onClick={handleBack}
-              className="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700 transition"
-            >
-              Xem đặt phòng
-            </button>
-          </>
-        )}
-
-        {status === "failed" && (
-          <>
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/463/463612.png"
-              alt="Failed"
-              className="w-20 mx-auto mb-4"
-            />
-            <h2 className="text-2xl font-bold text-red-600 mb-2">Thanh toán thất bại!</h2>
-            <p className="text-gray-700 mb-6">{message}</p>
-            <button
-              onClick={handleBack}
-              className="bg-gray-600 text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition"
-            >
-              Quay lại đặt phòng
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
+  return <div className="p-6 text-center">Đang xử lý thanh toán...</div>;
 }
