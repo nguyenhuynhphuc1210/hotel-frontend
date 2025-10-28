@@ -65,10 +65,12 @@ export default function PaymentDeposit() {
     } else if (paymentMethod === "vnpay") {
       response = await apiClient.post("/payment/vnpay", payload);
     }
+    console.log("Payment response:", response);
 
     if (response?.data?.payUrl) {
       window.location.href = response.data.payUrl;
     } else {
+      console.error("Không có payUrl trong response:", response?.data);
       toast.error("Không thể khởi tạo thanh toán");
     }
   } catch (error) {
