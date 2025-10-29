@@ -12,6 +12,7 @@ export default function Rooms() {
   const [lastPage, setLastPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [allRooms, setAllRooms] = useState([]);
+  const [inputValue, setInputValue] = useState("");
   const navigate = useNavigate();
 
   // ================== FETCH PAGINATED ROOMS ==================
@@ -79,20 +80,40 @@ export default function Rooms() {
     }
   };
 
-  // ================== HANDLE SEARCH ==================
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
+  const removeVietnameseTones = (str) => {
+    return str
+      .normalize("NFD") // tách ký tự + dấu
+      .replace(/[\u0300-\u036f]/g, "") // loại bỏ các dấu
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D");
   };
 
-  // ================== FILTERED & SORTED ROOMS ==================
   const getDisplayRooms = () => {
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
+      const query = removeVietnameseTones(searchQuery.toLowerCase().trim());
+
+      const typeMap = {
+        "phong don": "single",
+        "phong doi": "double",
+        "phong vip": "suite",
+      };
+
       const searchedRooms = allRooms.filter((room) => {
-        const roomNum = String(room.room_number).toLowerCase();
-        const roomType = room.type ? String(room.type).toLowerCase() : "";
-        return roomNum.includes(query) || roomType.includes(query);
+        const roomNum = removeVietnameseTones(
+          String(room.room_number).toLowerCase()
+        );
+        const roomType = removeVietnameseTones(
+          room.type ? String(room.type).toLowerCase() : ""
+        );
+        const fullRoomName = removeVietnameseTones(`phòng ${roomNum}`);
+
+        const mappedType = typeMap[query];
+
+        return (
+          fullRoomName.includes(query) ||
+          roomNum.includes(query) ||
+          (mappedType ? roomType === mappedType : false)
+        );
       });
 
       const sorted = [...searchedRooms].sort((a, b) => {
@@ -195,27 +216,42 @@ export default function Rooms() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search Bar */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
-          <div className="relative">
+          <div className="relative flex gap-2">
             <input
               type="text"
-              placeholder="Tìm kiếm theo số phòng hoặc loại phòng..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Nhập tìm kiếm"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearchQuery(inputValue);
+                  setCurrentPage(1);
+                }
+              }}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             />
-            <svg
-              className="absolute right-3 top-3.5 w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+
+            <button
+              onClick={() => {
+                setSearchQuery(inputValue);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
           </div>
         </div>
 

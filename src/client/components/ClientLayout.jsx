@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import ClientHeader from "./ClientHeader";
 import ClientFooter from "./ClientFooter";
+import ChatBot from "./ChatBot";
 
 export default function ClientLayout() {
   return (
@@ -10,6 +11,7 @@ export default function ClientLayout() {
         <Outlet />
       </main>
       <ClientFooter />
+      <ChatBot />
     </div>
   );
 }

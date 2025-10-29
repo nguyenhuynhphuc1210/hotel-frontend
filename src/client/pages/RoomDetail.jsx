@@ -119,20 +119,16 @@ export default function RoomDetail() {
     }
 
     try {
-      // Kiểm tra xem đã có customer_id chưa
-      let customerId = localStorage.getItem("customer_id");
+      let customerId = null;
 
-      if (!customerId) {
-        // Tạo mới customer
-        const res = await apiClient.post("/customers", {
-          fullname: form.fullname,
-          email: form.email,
-          phone: form.phone,
-          cccd: form.cccd,
-        });
-        customerId = res.data.id; // lấy id từ response
-        localStorage.setItem("customer_id", customerId);
-      }
+      const res = await apiClient.post("/customers", {
+        fullname: form.fullname,
+        email: form.email,
+        phone: form.phone,
+        cccd: form.cccd,
+      });
+
+      customerId = res.data.id;
 
       navigate("/paymentdeposit", {
         state: { room, form, selectedServices, total, customer_id: customerId },
@@ -495,7 +491,7 @@ export default function RoomDetail() {
                         onClick={handleProceedToPayment}
                         className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200"
                       >
-                        Tiến hành thanh toán
+                        Tiến hành đặt cọc
                       </button>
                       <button
                         onClick={() => navigate(-1)}

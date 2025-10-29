@@ -169,68 +169,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Khách hàng nói gì về chúng tôi
-            </h2>
-            <p className="text-gray-600">
-              Những đánh giá chân thực từ khách hàng
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl mr-3">
-                  👤
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Nguyễn Văn A</h4>
-                  <div className="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-              </div>
-              <p className="text-gray-600 italic">
-                "Phòng rất sạch sẽ và thoải mái. Nhân viên thân thiện và chuyên
-                nghiệp. Tôi sẽ quay lại!"
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl mr-3">
-                  👤
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Trần Thị B</h4>
-                  <div className="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-              </div>
-              <p className="text-gray-600 italic">
-                "Vị trí tuyệt vời, gần trung tâm. Ăn sáng buffet rất ngon. Đáng
-                tiền!"
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-xl mr-3">
-                  👤
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Lê Văn C</h4>
-                  <div className="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-              </div>
-              <p className="text-gray-600 italic">
-                "Trải nghiệm tuyệt vời! Hồ bơi và spa rất đẳng cấp. Highly
-                recommended!"
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* Call to Action */}
         <section className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-12 text-center">
           <div className="max-w-3xl mx-auto">

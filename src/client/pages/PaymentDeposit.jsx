@@ -1,26 +1,37 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiClient } from "../../api/axios";
 
 export default function PaymentDeposit() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { room, form, selectedServices = [], total, customer_id } = location.state || {};
+  const { room, form, selectedServices = [], total } = location.state || {};
+
   const [paymentMethod, setPaymentMethod] = useState("");
-  const customerId = customer_id || localStorage.getItem("customer_id");
+
   const deposit = Math.round(total * 0.2);
 
-  if (!room || !form) {
-    toast.error("Không có thông tin thanh toán");
-    navigate("/rooms");
-    return null;
-  }
+  // ✅ Lấy customer_id
+  const customerId =
+    location.state?.customer_id || localStorage.getItem("customer_id") || null;
+
+  // ❌ Nếu không có thông tin cần thiết → điều hướng lại
+  useEffect(() => {
+    if (!room || !form) {
+      toast.error("Không có thông tin thanh toán");
+      navigate("/rooms");
+    }
+
+    if (!customerId) {
+      toast.error("Không tìm thấy thông tin khách hàng");
+      navigate("/rooms");
+    }
+  }, [room, form, customerId, navigate]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    if (isNaN(date)) return dateString;
-    return date.toLocaleDateString("vi-VN");
+    return isNaN(date) ? dateString : date.toLocaleDateString("vi-VN");
   };
 
   const getTypeLabel = (type) => {
@@ -37,53 +48,56 @@ export default function PaymentDeposit() {
   };
 
   const handleConfirmPayment = async () => {
-  if (!paymentMethod) {
-    toast.error("Vui lòng chọn phương thức thanh toán");
-    return;
-  }
+    if (!paymentMethod) {
+      toast.error("Vui lòng chọn phương thức thanh toán");
+      return;
+    }
 
-  const payload = {
-    amount: deposit,
-    orderInfo: `Đặt cọc phòng ${room.room_number}`,
-    room_id: room.id,
-    customer_id: Number(customerId),
-    checkin_date: form.checkin_date,
-    checkout_date: form.checkout_date,
-    total: total,
-    services: selectedServices.map(s => ({
-      id: s.id,
-      quantity: s.quantity,
-      price: s.price
-    })),
+    if (!customerId) {
+      toast.error("Thiếu customer_id");
+      return;
+    }
+
+    const payload = {
+      amount: deposit,
+      orderInfo: `Đặt cọc phòng ${room.room_number}`,
+      room_id: room.id,
+      customer_id: Number(customerId),
+      checkin_date: form.checkin_date,
+      checkout_date: form.checkout_date,
+      total: total,
+      services: selectedServices.map((s) => ({
+        id: s.id,
+        quantity: s.quantity,
+        price: s.price,
+      })),
+    };
+
+    try {
+      let response;
+
+      if (paymentMethod === "momo") {
+        response = await apiClient.post("/payment/momo", payload);
+      } else {
+        response = await apiClient.post("/payment/vnpay", payload);
+      }
+
+      if (response?.data?.payUrl) {
+        window.location.href = response.data.payUrl;
+      } else {
+        toast.error("Không thể khởi tạo thanh toán");
+      }
+    } catch (error) {
+      console.error("Thanh toán lỗi:", error);
+      toast.error("Lỗi khi khởi tạo thanh toán");
+    }
   };
-
-  try {
-    let response;
-
-    if (paymentMethod === "momo") {
-      response = await apiClient.post("/payment/momo", payload);
-    } else if (paymentMethod === "vnpay") {
-      response = await apiClient.post("/payment/vnpay", payload);
-    }
-    console.log("Payment response:", response);
-
-    if (response?.data?.payUrl) {
-      window.location.href = response.data.payUrl;
-    } else {
-      console.error("Không có payUrl trong response:", response?.data);
-      toast.error("Không thể khởi tạo thanh toán");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error("Lỗi khi khởi tạo thanh toán");
-  }
-};
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center">Xác nhận đặt cọc</h2>
 
-      {/* Thông tin phòng */}
+      {/* ===== thông tin phòng ===== */}
       <div className="border-b pb-4 mb-4">
         <h3 className="text-xl font-semibold mb-3 text-blue-600">
           Thông tin phòng
@@ -99,7 +113,7 @@ export default function PaymentDeposit() {
         </p>
       </div>
 
-      {/* Thông tin khách */}
+      {/* ===== thông tin khách ===== */}
       <div className="border-b pb-4 mb-4">
         <h3 className="text-xl font-semibold mb-3 text-blue-600">
           Thông tin khách đặt
@@ -124,7 +138,7 @@ export default function PaymentDeposit() {
         </p>
       </div>
 
-      {/* Dịch vụ bổ sung */}
+      {/* ===== dịch vụ ===== */}
       {selectedServices.length > 0 && (
         <div className="border-b pb-4 mb-4">
           <h3 className="text-xl font-semibold mb-3 text-blue-600">
@@ -141,7 +155,7 @@ export default function PaymentDeposit() {
         </div>
       )}
 
-      {/* Tổng tiền */}
+      {/* ===== tổng tiền ===== */}
       <div className="text-right mb-6">
         <p className="text-lg">
           <strong>Tổng tiền:</strong>{" "}
@@ -154,7 +168,7 @@ export default function PaymentDeposit() {
         </p>
       </div>
 
-      {/* Chọn phương thức thanh toán */}
+      {/* ===== chọn phương thức thanh toán ===== */}
       <div className="mb-6">
         <h3 className="text-xl font-semibold mb-3 text-blue-600">
           Chọn phương thức thanh toán
