@@ -117,7 +117,7 @@ export default function ClientProfile() {
 
           <button
             type="button"
-            onClick={() => navigate("/client/change-password")}
+            onClick={() => navigate("/change-password")}
             className="bg-yellow-400 text-blue-900 px-5 py-2 rounded-lg font-semibold hover:bg-yellow-300 transition"
           >
             🔒 Đổi mật khẩu

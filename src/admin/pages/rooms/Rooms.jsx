@@ -2,36 +2,60 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiAdmin } from "../../../api/axios";
 import { toast } from "react-toastify";
+import * as XLSX from "xlsx";
 
 export default function Rooms() {
-  const [rooms, setRooms] = useState([]);
+  const [allRooms, setAllRooms] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [pageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
 
-  const fetchRooms = async (page = 1) => {
+  // Fetch tất cả phòng 1 lần
+  const fetchAllRooms = async () => {
     try {
-      const res = await apiAdmin.get(`/rooms?page=${page}`);
-      setRooms(res.data.data);
-      setCurrentPage(res.data.current_page);
-      setLastPage(res.data.last_page);
-      setTotal(res.data.total);
+      const res = await apiAdmin.get("/rooms?all=true");
+      setAllRooms(res.data);
     } catch (err) {
-      console.error("Lỗi khi tải phòng:", err);
+      console.error("Lỗi tải phòng:", err);
       toast.error("Không thể tải danh sách phòng!");
     }
   };
 
   useEffect(() => {
-    fetchRooms(currentPage);
-  }, [currentPage]);
+    fetchAllRooms();
+  }, []);
+
+  // Lọc và tìm kiếm khi thay đổi search / filter
+  useEffect(() => {
+    let rooms = [...allRooms];
+
+    if (searchQuery.trim()) {
+      rooms = rooms.filter((r) =>
+        r.room_number.toString().includes(searchQuery.trim())
+      );
+    }
+
+    if (statusFilter !== "all") {
+      rooms = rooms.filter((r) => r.status === statusFilter);
+    }
+
+    if (typeFilter !== "all") {
+      rooms = rooms.filter((r) => r.type === typeFilter);
+    }
+
+    setFilteredRooms(rooms);
+    setCurrentPage(1); // reset page khi lọc
+  }, [allRooms, searchQuery, statusFilter, typeFilter]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa phòng này?")) return;
     try {
       await apiAdmin.delete(`/rooms/${id}`);
       toast.success("Xóa phòng thành công!");
-      fetchRooms(currentPage);
+      fetchAllRooms();
     } catch (err) {
       console.error("Lỗi khi xóa phòng:", err);
       toast.error("Không thể xóa phòng!");
@@ -80,10 +104,56 @@ export default function Rooms() {
     }
   };
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= lastPage && page !== currentPage) {
-      setCurrentPage(page);
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: "array" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      if (!jsonData.length) {
+        toast.error("File Excel trống hoặc sai định dạng!");
+        return;
+      }
+
+      // Kiểm tra và chuyển dữ liệu
+      const formattedRooms = jsonData.map((r) => ({
+        room_number: r.room_number || r["Số phòng"],
+        type: r.type || r["Loại phòng"]?.toLowerCase(),
+        price: r.price || r["Giá"],
+        status: r.status || r["Trạng thái"]?.toLowerCase() || "available",
+      }));
+
+      // Gửi lên server
+      const res = await apiAdmin.post("/rooms/import", formattedRooms);
+
+      if (res.status === 200) {
+        toast.success(`Import thành công ${formattedRooms.length} phòng!`);
+        fetchAllRooms(); // reload lại danh sách
+      } else {
+        toast.error("Lỗi khi import phòng!");
+      }
+    } catch (err) {
+      console.error("Lỗi import Excel:", err);
+      toast.error("Không thể đọc file Excel!");
     }
+
+    // reset input để lần sau chọn cùng file vẫn trigger
+    e.target.value = "";
+  };
+
+  // Phân trang frontend
+  const lastPage = Math.ceil(filteredRooms.length / pageSize);
+  const paginatedRooms = filteredRooms.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= lastPage) setCurrentPage(page);
   };
 
   const renderPagination = () => {
@@ -92,9 +162,7 @@ export default function Rooms() {
     let start = Math.max(currentPage - 2, 1);
     let end = Math.min(start + maxVisible - 1, lastPage);
 
-    if (end - start < maxVisible - 1) {
-      start = Math.max(end - maxVisible + 1, 1);
-    }
+    if (end - start < maxVisible - 1) start = Math.max(end - maxVisible + 1, 1);
 
     for (let i = start; i <= end; i++) {
       pages.push(
@@ -159,15 +227,64 @@ export default function Rooms() {
     <div>
       <h2 className="text-2xl font-bold mb-4">Quản lý phòng</h2>
 
-      <Link
-        to="/admin/rooms/add"
-        className="inline-block mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        + Thêm phòng
-      </Link>
+      <div className="flex flex-wrap gap-4 mb-4 items-center">
+        {/* Nút thêm phòng */}
+        <Link
+          to="/admin/rooms/add"
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Thêm phòng
+        </Link>
+
+        {/* Import Excel */}
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          id="excelInput"
+          className="hidden"
+          onChange={handleImportExcel}
+        />
+        <label
+          htmlFor="excelInput"
+          className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
+        >
+          📁 Import Excel
+        </label>
+
+        {/* Bộ lọc */}
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo số phòng..."
+          className="px-3 py-2 border rounded"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        <select
+          className="px-3 py-2 border rounded"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">Tất cả trạng thái</option>
+          <option value="available">Còn trống</option>
+          <option value="booked">Đã đặt</option>
+          <option value="cleaning">Đang dọn</option>
+        </select>
+
+        <select
+          className="px-3 py-2 border rounded"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+        >
+          <option value="all">Tất cả loại phòng</option>
+          <option value="single">Phòng đơn</option>
+          <option value="double">Phòng đôi</option>
+          <option value="suite">Phòng VIP</option>
+        </select>
+      </div>
 
       <div className="mb-2 text-gray-600">
-        Tổng cộng: <strong>{total}</strong> phòng
+        Tổng cộng: <strong>{filteredRooms.length}</strong> phòng
       </div>
 
       <table className="w-full border-collapse bg-white shadow rounded">
@@ -183,14 +300,14 @@ export default function Rooms() {
           </tr>
         </thead>
         <tbody>
-          {rooms.length > 0 ? (
-            rooms.map((room) => (
+          {paginatedRooms.length > 0 ? (
+            paginatedRooms.map((room) => (
               <tr key={room.id}>
                 <td className="border px-4 py-2">{room.id}</td>
                 <td className="border px-4 py-2">
-                  {room.images && room.images.length > 0 ? (
+                  {room.images?.length > 0 ? (
                     <img
-                      src={room.images[0].image_path} // trực tiếp URL Cloudinary
+                      src={room.images[0].image_path}
                       alt={room.room_number}
                       className="w-16 h-16 object-cover rounded"
                     />
@@ -237,7 +354,6 @@ export default function Rooms() {
         </tbody>
       </table>
 
-      {/* 🟢 Phân trang */}
       {lastPage > 1 && renderPagination()}
     </div>
   );

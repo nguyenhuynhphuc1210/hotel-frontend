@@ -18,6 +18,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -89,6 +91,29 @@ export default function Dashboard() {
     if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
     if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
     return value;
+  };
+
+  // 🧾 HÀM XUẤT EXCEL
+  const exportToExcel = () => {
+    if (revenueData.length === 0) {
+      alert("Không có dữ liệu để xuất!");
+      return;
+    }
+
+    const worksheetData = revenueData.map((item, index) => ({
+      "STT": index + 1,
+      "Ngày": item.date,
+      "Doanh thu (VNĐ)": item.revenue,
+      "Hiển thị": formatRevenue(item.revenue),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DoanhThu");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const file = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(file, `BaoCaoDoanhThu_${period}.xlsx`);
   };
 
   const cards = [
@@ -176,6 +201,14 @@ export default function Dashboard() {
                 {option.label}
               </button>
             ))}
+
+            {/* Nút xuất Excel */}
+            <button
+              onClick={exportToExcel}
+              className="px-4 py-2 rounded-lg font-semibold bg-green-600 text-white hover:bg-green-700"
+            >
+              📤 Xuất Excel
+            </button>
           </div>
         </div>
 
